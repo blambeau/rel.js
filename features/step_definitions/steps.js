@@ -65,6 +65,18 @@ module.exports = function(){
     });
   }
 
+  var insert = function(varname, value, callback){
+    rv = database[varname];
+    rv.insert(value, function(err, res){
+      if (err){
+        console.log(err);
+        return callback.fail(err);
+      }
+      expect(res).to.be(rv);
+      callback();
+    });
+  }
+
   var isEmpty = function(callback){
     return function(err, r){
       if (err){ return callback.fail(err); }
@@ -73,21 +85,30 @@ module.exports = function(){
     }
   };
 
-  var hasOneTuple = function(callback){
+  var hasNTuples = function(callback, n){
     return function(err, r){
       if (err){ return callback.fail(err); }
-      expect(r.length).to.eql(1);
+      expect(r.length).to.eql(n);
       callback();
     }
   };
 
-  this.Given(/^I affect the following value to `documents`$/, function (str, callback) {
+  this.Given(/^I assign the following value to `documents`$/, function (str, callback) {
     var value = json(str, callback);
-    affect('documents', value, callback);
+    assign('documents', value, callback);
+  });
+
+  this.Given(/^I insert the following value to `documents`$/, function (str, callback) {
+    var value = json(str, callback);
+    insert('documents', value, callback);
   });
 
   this.Then(/^`documents` has one tuple$/, function (callback) {
-    valueOf('documents', hasOneTuple(callback));
+    valueOf('documents', hasNTuples(callback, 1));
+  });
+
+  this.Then(/^`documents` has three tuples$/, function (callback) {
+    valueOf('documents', hasNTuples(callback, 3));
   });
 
   this.Then(/^`documents` is empty$/, function (callback) {

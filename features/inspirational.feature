@@ -41,3 +41,23 @@ Feature: Inspirational Driven Development
 
     Given I ask for the only document with `{ "id": 1 }`
     Then the resulting tuple's `at` is a javascript time
+
+  Scenario: Inserting a relation
+
+    Given I open the database
+    And I assign the following value to `documents`
+      """
+      [
+        { "id": 1, "title": "Getting started with Finitio", "at": "2014-05-09T15:25" }
+      ]
+      """
+    Then `documents` has one tuple
+
+    Given I insert the following value to `documents`
+      """
+      [
+        { "id": 2, "title": "Getting started with Rel.js", "at": "2014-05-11T09:12" },
+        { "id": 3, "title": "Getting started with Alf",    "at": "2014-05-11T09:13" }
+      ]
+      """
+    Then `documents` has three tuples
