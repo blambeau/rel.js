@@ -53,10 +53,13 @@ module.exports = function(){
     });
   }
 
-  var affect = function(varname, value, callback){
+  var assign = function(varname, value, callback){
     rv = database[varname];
-    rv.affect(value, function(err, res){
-      if (err){ return callback.fail(err); }
+    rv.assign(value, function(err, res){
+      if (err){
+        console.log(err);
+        return callback.fail(err);
+      }
       expect(res).to.be(rv);
       callback();
     });

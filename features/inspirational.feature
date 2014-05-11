@@ -28,10 +28,10 @@ Feature: Inspirational Driven Development
     Given I open the database
     Then `documents` is empty
 
-  Scenario: Affecting a relation value
+  Scenario: Assigning a relation value
 
     Given I open the database
-    And I affect the following value to `documents`
+    And I assign the following value to `documents`
       """
       [
         { "id": 1, "title": "Getting started with Finitio", "at": "2014-05-09T15:25" }
