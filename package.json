@@ -30,6 +30,7 @@
     "grunt-cli": "~0.1.6",
     "grunt-browserify": "~1.3.1",
     "grunt-cucumber": "git://github.com/llambeau/grunt-cucumber-js.git#master",
+    "grunt-contrib-watch": "~0.6.1",
     "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-uglify": "~0.4.0",

@@ -25,6 +25,13 @@ module.exports = function(grunt) {
       }
     },
 
+    watch: {
+      testing: {
+        files: ['lib/**/*.js', 'test/**/*.js', 'features/**/*'],
+        tasks: ['test']
+      }
+    },
+
     browserify: {
       main: {
         files: {
@@ -55,7 +62,7 @@ module.exports = function(grunt) {
 
   });
 
-  grunt.registerTask('default',          ['test:unit']);
+  grunt.registerTask('default',          ['test']);
   grunt.registerTask('compile',          ['browserify', 'uglify']);
 
   grunt.registerTask('test',             ['test:unit', 'test:acceptance']);
@@ -64,8 +71,9 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-cucumber');
   grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-cucumber');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 }

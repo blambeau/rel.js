@@ -99,6 +99,7 @@ module.exports = function(){
   this.Then(/^the resulting tuple's `at` is a javascript time$/, function (callback) {
     expect(resTuple).to.be.defined;
     expect(resTuple['at']).to.be.a(Date);
+    callback();
   });
 
 }
