@@ -77,6 +77,18 @@ module.exports = function(){
     });
   }
 
+  var deleteFn = function(varname, pred, callback){
+    rv = database[varname];
+    rv.delete(pred, function(err, res){
+      if (err){
+        console.log(err);
+        return callback.fail(err);
+      }
+      expect(res).to.be(rv);
+      callback();
+    });
+  }
+
   var isEmpty = function(callback){
     return function(err, r){
       if (err){ return callback.fail(err); }
@@ -107,12 +119,32 @@ module.exports = function(){
     valueOf('documents', hasNTuples(callback, 1));
   });
 
+  this.Then(/^`documents` has two tuples$/, function (callback) {
+    valueOf('documents', hasNTuples(callback, 2));
+  });
+
   this.Then(/^`documents` has three tuples$/, function (callback) {
     valueOf('documents', hasNTuples(callback, 3));
   });
 
   this.Then(/^`documents` is empty$/, function (callback) {
     valueOf('documents', isEmpty(callback));
+  });
+
+  this.Given(/^I delete from `documents` with the following predicate:$/, function (str, callback) {
+    var pred = json(str, callback);
+    deleteFn('documents', pred, callback);
+  });
+
+  this.Then(/^the document with `(.*?)` does not exist$/, function (cond, callback) {
+    var cond = json(cond, callback);
+    database['documents'].one(cond, function(err, res){
+      if (err){
+        callback();
+      } else {
+        return callback.fail("Excepted no document, got one.");
+      }
+    });
   });
 
   this.Given(/^I ask for the only document with `(.*?)`$/, function (cond, callback) {

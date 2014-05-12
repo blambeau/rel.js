@@ -61,3 +61,23 @@ Feature: Inspirational Driven Development
       ]
       """
     Then `documents` has three tuples
+
+  Scenario: Delete from a relation
+
+    Given I open the database
+    And I assign the following value to `documents`
+      """
+      [
+        { "id": 1, "title": "Getting started with Finitio", "at": "2014-05-09T15:25" },
+        { "id": 2, "title": "Getting started with Rel.js", "at": "2014-05-11T09:12" },
+        { "id": 3, "title": "Getting started with Alf",    "at": "2014-05-11T09:13" }
+      ]
+      """
+    Then `documents` has three tuples
+
+    Given I delete from `documents` with the following predicate:
+      """
+      { "id": 2 }
+      """
+    Then `documents` has two tuples
+    And the document with `{ "id": 2 }` does not exist
