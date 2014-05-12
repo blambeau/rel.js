@@ -77,6 +77,18 @@ module.exports = function(){
     });
   }
 
+  var update = function(varname, pred, updt, callback){
+    rv = database[varname];
+    rv.update(pred, updt, function(err, res){
+      if (err){
+        console.log(err);
+        return callback.fail(err);
+      }
+      expect(res).to.be(rv);
+      callback();
+    });
+  }
+
   var deleteFn = function(varname, pred, callback){
     rv = database[varname];
     rv.delete(pred, function(err, res){
@@ -147,6 +159,12 @@ module.exports = function(){
     });
   });
 
+  this.Given(/^I update `documents` where `(.*?)` with the following updating:$/, function (cond, updt, callback) {
+    var pred = json(cond, callback);
+    var updt = json(updt, callback);
+    update('documents', pred, updt, callback);
+  });
+
   this.Given(/^I ask for the only document with `(.*?)`$/, function (cond, callback) {
     var cond = json(cond, callback);
     one('documents', cond, callback);
@@ -155,6 +173,12 @@ module.exports = function(){
   this.Then(/^the resulting tuple's `at` is a javascript time$/, function (callback) {
     expect(resTuple).to.be.defined;
     expect(resTuple['at']).to.be.a(Date);
+    callback();
+  });
+
+  this.Then(/^the resulting tuple's `title` is "([^"]*)"$/, function (str, callback) {
+    expect(resTuple).to.be.defined;
+    expect(resTuple['title']).to.eql(str);
     callback();
   });
 
