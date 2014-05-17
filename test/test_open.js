@@ -11,7 +11,7 @@ describe("Rel.open", function(){
 
   var destroy = function(){
     return Rel.destroy(dbspec);
-  }
+  };
 
   // Remove the database before tests
   prom.before(destroy);

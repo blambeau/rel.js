@@ -13,7 +13,7 @@ describe("Relvar.value", function(){
       .then(function(db){
         database = db;
       });
-  })
+  });
 
   prom.it('returns an array of tuples', function(){
     return database.documents

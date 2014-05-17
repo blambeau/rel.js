@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 module.exports = function(grunt) {
   
@@ -8,6 +8,26 @@ module.exports = function(grunt) {
     
     clean: ['dist'],
     
+    jshint: {
+      src: [
+        'index.js',
+        'lib/**/*.js'
+      ],
+      test: [
+        'test/**/*.js'
+      ],
+      options: {
+        curly: true,
+        immed: true,
+        newcap: true,
+        noarg: true,
+        sub: true,
+        boss: true,
+        eqnull: true
+      },
+      globals: {}
+    },
+
     cucumberjs: {
       src: './features',
       options: {
@@ -26,14 +46,22 @@ module.exports = function(grunt) {
     },
 
     watch: {
+      jshint: {
+        files: [
+          'index.js',
+          'lib/**/*.js',
+          'test/**/*.js'
+        ],
+        tasks: [ 'jshint' ]
+      },
       unitTesting: {
         files: ['lib/**/*.js', 'test/**/*.js'],
         tasks: ['test:unit']
       },
-      acceptanceTesting: {
-        files: ['lib/**/*.js', 'features/**/*'],
-        tasks: ['test:acceptance']
-      }
+      // acceptanceTesting: {
+      //   files: ['lib/**/*.js', 'features/**/*'],
+      //   tasks: ['test:acceptance']
+      // },
     },
 
     browserify: {
@@ -75,9 +103,10 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-cucumber');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
-}
+};

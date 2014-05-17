@@ -11,7 +11,7 @@ describe("Rel.create", function(){
 
   var destroy = function(){
     return Rel.destroy(dbspec);
-  }
+  };
 
   // Remove the database before tests
   prom.before(destroy);
@@ -57,7 +57,7 @@ describe("Rel.create", function(){
               expect(false).to.eql(true);
             })
             .catch(function(err){
-              expect(err).to.be.defined;
+              expect(err).not.to.be(undefined);
               expect(err.status).to.eql(404);
             });
         });
