@@ -1,50 +1,66 @@
 Rel = require('../lib/rel');
 expect = require('expect.js');
+prom = require('./prom.js');
 
 describe("Rel.create", function(){
 
-  var options = { schema: Rel.parseSchema("{}") };
+  var dbspec = {
+    name: 'tests',
+    schema: Rel.parseSchema("{}")
+  };
 
-  var destroy = function(done){
-    Rel.destroy('tests', done);
+  var destroy = function(){
+    return Rel.destroy(dbspec);
   }
 
-  describe('when the database does not exists', function(){
-    before(destroy);
-    after(destroy);
+  // Remove the database before tests
+  prom.before(destroy);
 
-    it('creates a fresh new database if not existing', function(done){
-      Rel.create('tests', options, function(err, s){
-        if (err){ return done(err); }
-        expect(s).to.be.a(Rel.Database);
-        expect(s.reljsVersion).to.eql(Rel.VERSION);
-        done();
-      });
+  // Remove it afterwards too
+  prom.after(destroy);
+
+  describe('when the database does not exists', function(){
+
+    prom.it('creates a fresh new database if not existing', function(){
+      return Rel
+        .create(dbspec)
+        .then(function(db){
+          expect(db).to.be.a(Rel.Database);
+          expect(db.reljsVersion).to.eql(Rel.VERSION);
+        });
     });
 
   });
 
   describe('when the database does exist', function(){
 
-    before(function(done){
-      Rel.create('tests', options, function(err, s){
-        s.storage.put({title: 'foo'}, 'foo', done);
-      });
+    prom.before(function(){
+      return Rel
+        .create(dbspec)
+        .then(function(db){
+          return db.storage.put({title: 'foo'}, 'foo');
+        });
     });
 
-    after(destroy);
-
-    it('opens the database unchanged', function(done){
-      Rel.create('tests', options, function(err, s){
-        if (err){ return done(err); }
-        expect(s).to.be.a(Rel.Database);
-        expect(s.reljsVersion).to.eql(Rel.VERSION);
-        s.storage.get('foo', function(err, doc){
-          expect(err).to.be.defined;
-          expect(err.status).to.eql(404);
-          done();
+    prom.it('clear any existing data', function(){
+      return Rel
+        .create(dbspec)
+        .then(function(db){
+          expect(db).to.be.a(Rel.Database);
+          expect(db.reljsVersion).to.eql(Rel.VERSION);
+          return db;
+        })
+        .then(function(db){
+          return db.storage
+            .get('foo')
+            .then(function(){
+              expect(false).to.eql(true);
+            })
+            .catch(function(err){
+              expect(err).to.be.defined;
+              expect(err.status).to.eql(404);
+            });
         });
-      });
     });
 
   });

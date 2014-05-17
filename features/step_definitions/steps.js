@@ -11,175 +11,131 @@ module.exports = function(){
   var dbOpts   = null;
   var database = null;
   var resTuple = null;
+
+  var self = this;
+  var prom = {
+    delegate: function(to, description, test){
+      return self[to](description, function(){
+        var callback = arguments[arguments.length - 1];
+        var result = test.apply(this, arguments);
+        if (result && result.then) {
+          result.then(function(){
+            callback();
+          })
+          .catch(function(err){
+            callback.fail(err);
+          });
+        } else {
+          callback();
+        }
+      });
+    },
+    Given: function(description, test){
+      return this.delegate('Given', description, test);
+    },
+    Then: function(description, test){
+      return this.delegate('Then', description, test);
+    }
+  }
   
-  this.Given(/^I create a logical\/physical data using the schema$/, function (src, callback) {
+  prom.Given(/^I create a logical\/physical data using the schema$/, function(src) {
     dbSystem = kernel.parse(src, fioOpts);
     dbOpts = {
+      name: "testdb",
       system:   dbSystem,
       logical:  dbSystem['Logical'],
       physical: dbSystem['Physical']
     };
-    Rel.create('testdb', dbOpts, function(err, db){
-      if (err){ return callback.fail(err); }
-      callback();
-    });
+    return Rel.create(dbOpts);
   });
 
-  this.Given(/^I open the database$/, function (callback) {
-    Rel.open('testdb', dbOpts, function(err, db){
-      if (err){ return callback.fail(err); }
-      database = db;
-      callback();
-    });
+  prom.Given(/^I open the database$/, function() {
+    return Rel.open(dbOpts)
+      .then(function(db){
+        database = db;
+      });
   });
-
-  var json = function(str, callback){
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      return callback.fail(e);
-    }
+  
+  var json = function(str){
+    return JSON.parse(str);
   }
-
-  var valueOf = function(varname, done){
-    database[varname].value(done);
-  };
-
-  var one = function(varname, cond, callback){
-    database[varname].one(cond, function(err, res){
-      if (err){ return callback.fail(err); }
-      expect(resTuple = res).to.be.defined;
-      callback();
-    });
-  }
-
-  var assign = function(varname, value, callback){
-    rv = database[varname];
-    rv.assign(value, function(err, res){
-      if (err){
-        console.log(err);
-        return callback.fail(err);
-      }
-      expect(res).to.be(rv);
-      callback();
-    });
-  }
-
-  var insert = function(varname, value, callback){
-    rv = database[varname];
-    rv.insert(value, function(err, res){
-      if (err){
-        console.log(err);
-        return callback.fail(err);
-      }
-      expect(res).to.be(rv);
-      callback();
-    });
-  }
-
-  var update = function(varname, pred, updt, callback){
-    rv = database[varname];
-    rv.update(pred, updt, function(err, res){
-      if (err){
-        console.log(err);
-        return callback.fail(err);
-      }
-      expect(res).to.be(rv);
-      callback();
-    });
-  }
-
-  var deleteFn = function(varname, pred, callback){
-    rv = database[varname];
-    rv.delete(pred, function(err, res){
-      if (err){
-        console.log(err);
-        return callback.fail(err);
-      }
-      expect(res).to.be(rv);
-      callback();
-    });
-  }
-
-  var isEmpty = function(callback){
-    return function(err, r){
-      if (err){ return callback.fail(err); }
-      expect(r).to.be.empty;
-      callback();
-    }
-  };
-
-  var hasNTuples = function(callback, n){
-    return function(err, r){
-      if (err){ return callback.fail(err); }
-      expect(r.length).to.eql(n);
-      callback();
-    }
-  };
-
-  this.Given(/^I assign the following value to `documents`$/, function (str, callback) {
-    var value = json(str, callback);
-    assign('documents', value, callback);
+  
+  prom.Given(/^I assign the following value to `documents`$/, function(str){
+    var value = json(str);
+    return database.documents.assign(value);
   });
-
-  this.Given(/^I insert the following value to `documents`$/, function (str, callback) {
-    var value = json(str, callback);
-    insert('documents', value, callback);
+  
+  prom.Given(/^I insert the following value to `documents`$/, function (str) {
+    var value = json(str);
+    return database.documents.insert(value);
   });
-
-  this.Then(/^`documents` has one tuple$/, function (callback) {
-    valueOf('documents', hasNTuples(callback, 1));
+  
+  prom.Then(/^`documents` has one tuple$/, function(){
+    return database.documents.value()
+      then(function(rel){
+        expect(rel.length).to.eql(1);
+      });
   });
-
-  this.Then(/^`documents` has two tuples$/, function (callback) {
-    valueOf('documents', hasNTuples(callback, 2));
+  
+  prom.Then(/^`documents` has two tuples$/, function(){
+    return database.documents.value()
+      .then(function(rel){
+        expect(rel.length).to.eql(2);
+      });
   });
-
-  this.Then(/^`documents` has three tuples$/, function (callback) {
-    valueOf('documents', hasNTuples(callback, 3));
+  
+  prom.Then(/^`documents` has three tuples$/, function() {
+    return database.documents.value()
+      .then(function(rel){
+        expect(rel.length).to.eql(3);
+      });
   });
-
-  this.Then(/^`documents` is empty$/, function (callback) {
-    valueOf('documents', isEmpty(callback));
+  
+  prom.Then(/^`documents` is empty$/, function(){
+    return database.documents.value()
+      .then(function(rel){
+        console.log("empty");
+        expect(rel.length).to.eql(0);
+      });
   });
-
-  this.Given(/^I delete from `documents` with the following predicate:$/, function (str, callback) {
-    var pred = json(str, callback);
-    deleteFn('documents', pred, callback);
+  
+  prom.Given(/^I delete from `documents` with the following predicate:$/, function (str, callback) {
+    var pred = json(str);
+    return database.documents.delete(pred);
   });
-
-  this.Then(/^the document with `(.*?)` does not exist$/, function (cond, callback) {
-    var cond = json(cond, callback);
-    database['documents'].one(cond, function(err, res){
-      if (err){
-        callback();
-      } else {
-        return callback.fail("Excepted no document, got one.");
-      }
-    });
+  
+  prom.Then(/^the document with `(.*?)` does not exist$/, function (cond) {
+    var cond = json(cond);
+    return database.documents.one(cond)
+      .then(function(){
+        expect(false).to.eql(true);
+      })
+      .catch(function(){
+      });
   });
-
-  this.Given(/^I update `documents` where `(.*?)` with the following updating:$/, function (cond, updt, callback) {
-    var pred = json(cond, callback);
-    var updt = json(updt, callback);
-    update('documents', pred, updt, callback);
+  
+  prom.Given(/^I update `documents` where `(.*?)` with the following updating:$/, function(cond, updt){
+    var pred = json(cond);
+    var updt = json(updt);
+    return database.documents.update(pred, updt);
   });
-
-  this.Given(/^I ask for the only document with `(.*?)`$/, function (cond, callback) {
-    var cond = json(cond, callback);
-    one('documents', cond, callback);
+  
+  prom.Given(/^I ask for the only document with `(.*?)`$/, function(cond){
+    var cond = json(cond);
+    return database.documents.one(cond)
+      .then(function(tuple){
+        resTuple = tuple;
+      });
   });
-
-  this.Then(/^the resulting tuple's `at` is a javascript time$/, function (callback) {
-    expect(resTuple).to.be.defined;
+  
+  prom.Then(/^the resulting tuple's `at` is a javascript time$/, function(){
+    expect(resTuple).not.to.be(undefined);
     expect(resTuple['at']).to.be.a(Date);
-    callback();
   });
-
-  this.Then(/^the resulting tuple's `title` is "([^"]*)"$/, function (str, callback) {
-    expect(resTuple).to.be.defined;
+  
+  prom.Then(/^the resulting tuple's `title` is "([^"]*)"$/, function(str){
+    expect(resTuple).not.to.be(undefined);
     expect(resTuple['title']).to.eql(str);
-    callback();
   });
 
 }

@@ -24,10 +24,10 @@ Feature: Inspirational Driven Development
       """
 
   Scenario: Reading a relvar at the initial state
-
+  
     Given I open the database
     Then `documents` is empty
-
+  
   Scenario: Assigning a relation value
 
     Given I open the database
@@ -41,9 +41,9 @@ Feature: Inspirational Driven Development
 
     Given I ask for the only document with `{ "id": 1 }`
     Then the resulting tuple's `at` is a javascript time
-
+  
   Scenario: Inserting a relation
-
+  
     Given I open the database
     And I assign the following value to `documents`
       """
@@ -52,7 +52,7 @@ Feature: Inspirational Driven Development
       ]
       """
     Then `documents` has one tuple
-
+  
     Given I insert the following value to `documents`
       """
       [
@@ -61,9 +61,9 @@ Feature: Inspirational Driven Development
       ]
       """
     Then `documents` has three tuples
-
+  
   Scenario: Delete from a relvar
-
+  
     Given I open the database
     And I assign the following value to `documents`
       """
@@ -74,16 +74,16 @@ Feature: Inspirational Driven Development
       ]
       """
     Then `documents` has three tuples
-
+  
     Given I delete from `documents` with the following predicate:
       """
       { "id": 2 }
       """
     Then `documents` has two tuples
     And the document with `{ "id": 2 }` does not exist
-
+  
   Scenario: Updating a relvar
-
+  
     Given I open the database
     And I assign the following value to `documents`
       """
@@ -94,12 +94,12 @@ Feature: Inspirational Driven Development
       ]
       """
     Then `documents` has three tuples
-
+  
     Given I update `documents` where `{ "id": 2 }` with the following updating:
       """
       { "title": "Getting started!!" }
       """
     Then `documents` has three tuples
-
+  
     Given I ask for the only document with `{ "id": 2 }`
     Then the resulting tuple's `title` is "Getting started!!"

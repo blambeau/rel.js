@@ -26,9 +26,13 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      testing: {
-        files: ['lib/**/*.js', 'test/**/*.js', 'features/**/*'],
-        tasks: ['test']
+      unitTesting: {
+        files: ['lib/**/*.js', 'test/**/*.js'],
+        tasks: ['test:unit']
+      },
+      acceptanceTesting: {
+        files: ['lib/**/*.js', 'features/**/*'],
+        tasks: ['test:acceptance']
       }
     },
 

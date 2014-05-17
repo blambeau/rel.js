@@ -1,51 +1,63 @@
 Rel = require('../lib/rel');
 expect = require('expect.js');
+prom = require('./prom.js');
 
 describe("Rel.open", function(){
 
-  var options = { schema: Rel.parseSchema("{}") };
+  var dbspec = {
+    name: 'tests',
+    schema: Rel.parseSchema("{}")
+  };
 
-  var destroy = function(done){
-    Rel.destroy('tests', done);
+  var destroy = function(){
+    return Rel.destroy(dbspec);
   }
+
+  // Remove the database before tests
+  prom.before(destroy);
+
+  // Remove it afterwards too
+  prom.after(destroy);
 
   describe('when the database does not exists', function(){
 
-    before(destroy);
-    after(destroy);
-
-    it('creates a fresh new database if not existing', function(done){
-      Rel.open('tests', options, function(err, s){
-        if (err){ return done(err); }
-        expect(s).to.be.a(Rel.Database);
-        expect(s.reljsVersion).to.eql(Rel.VERSION);
-        done();
-      });
+    prom.it('creates a fresh new database', function(){
+      return Rel
+        .open(dbspec)
+        .then(function(db){
+          expect(db).to.be.a(Rel.Database);
+          expect(db.reljsVersion).to.eql(Rel.VERSION);
+          return db;
+        });
     });
 
   });
 
   describe('when the database does exist', function(){
 
-    before(function(done){
-      Rel.open('tests', options, function(err, s){
-        s.storage.put({title: 'foo'}, 'foo', done);
-      });
+    prom.before(function(){
+      return Rel
+        .open(dbspec)
+        .then(function(db){
+          return db.storage.put({title: 'foo'}, 'foo');
+        });
     });
 
-    after(destroy);
-
-    it('opens the database unchanged', function(done){
-      Rel.open('tests', options, function(err, s){
-        if (err){ return done(err); }
-        expect(s).to.be.a(Rel.Database);
-        expect(s.reljsVersion).to.eql(Rel.VERSION);
-        s.storage.get('foo', function(err, doc){
-          if (err){ return done(err); }
-          expect(doc['title']).to.eql('foo');
-          done();
+    it('opens the database unchanged', function(){
+      return Rel
+        .open(dbspec)
+        .then(function(db){
+          expect(db).to.be.a(Rel.Database);
+          expect(db.reljsVersion).to.eql(Rel.VERSION);
+          return db;
+        })
+        .then(function(db){
+          return db.storage
+            .get('foo')
+            .then(function(doc){
+              expect(doc.title).to.eql('foo');
+            });
         });
-      });
     });
 
   });

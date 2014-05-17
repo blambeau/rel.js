@@ -1,24 +1,26 @@
-Rel    = require('../../lib/rel');
 expect = require('expect.js');
+prom = require('../prom.js');
+Rel    = require('../../lib/rel');
 Fixtures = require('../fixtures');
 
 describe("Relvar.value", function(){
 
   var database;
 
-  before(function(done){
-    Fixtures.LogicalDb(function(err, db){
-      if (err){ return done(err); }
-      database = db;
-      done();
-    });
+  prom.before(function(){
+    return Fixtures
+      .logical()
+      .then(function(db){
+        database = db;
+      });
   })
 
-  it('returns an array of tuples', function(done){
-    database.documents.value(function(err, rel){
-      expect(rel).to.eql([]);
-      done();
-    });
+  prom.it('returns an array of tuples', function(){
+    return database.documents
+      .value()
+      .then(function(rel){
+        expect(rel).to.eql([]);
+      });
   });
 
 });
