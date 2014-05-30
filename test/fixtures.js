@@ -4,11 +4,11 @@ module.exports = (function(){
   fs = require('fs');
 
   var systemSrc = fs.readFileSync('test/fixtures.fio').toString();
-  var system    = Finitio.parse(systemSrc, {
-    world: { Finitio: Finitio }
-  });
+  var system    = Finitio.system(systemSrc);
 
   return {
+
+    system: system,
 
     physical: function(){
       return Rel.create({
@@ -21,8 +21,8 @@ module.exports = (function(){
       return Rel.create({
         name: 'logical',
         system:   system,
-        logical:  system['Logical'],
-        physical: system['Physical']
+        logical:  system.Logical,
+        physical: system.Physical
       });
     }
 

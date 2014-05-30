@@ -1,24 +1,6 @@
-# Nil & others
-Any = .
-Nil = .( v | v === null )
+@import finitio/data
 
-# Booleans
-Boolean = .Boolean
-True    = .Boolean( b | b === true )
-False   = .Boolean( b | b === false )
-
-# Numerics
-Numeric = .Number
-Real    = .Number( n | !(n % 1 === 0) )
-Integer = .Number( n | n % 1 === 0    )
-
-# String
-String  = .String
-Title   = String( s | s.length > 0 )
-
-# Dates and Time
-Date = .Date <iso8601> .String .Finitio.Contracts.Date.iso8601
-Time = .Date <iso8601> .String .Finitio.Contracts.Time.iso8601
+Title = String( s | s.length > 0 )
 
 # Logical Schema
 Logical = {

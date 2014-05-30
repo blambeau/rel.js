@@ -1,6 +1,7 @@
-Rel = require('../lib/rel');
-expect = require('expect.js');
-prom = require('./prom.js');
+var World = require('./world');
+var Rel = World.Rel,
+    expect = World.expect,
+    prom = World.prom;
 
 describe("Rel.destroy", function(){
 
