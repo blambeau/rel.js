@@ -8,5 +8,11 @@ describe("Predicate.dress", function(){
     expect(p(2)).to.be(true);
     expect(p(3)).to.be(false);
   });
-  
+
+  it('works with an object', function(){
+    var p = Predicate.dress({ x: 2 });
+    expect(p({ x: 2 })).to.be(true);
+    expect(p({ x: 3 })).to.be(false);
+  });
+
 });
