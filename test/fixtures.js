@@ -1,6 +1,6 @@
 module.exports = (function(){
   Rel = require('../lib/rel');
-  Finitio = require('finitio.js');
+  Finitio = require('finitio');
   fs = require('fs');
 
   var systemSrc = fs.readFileSync('test/fixtures.fio').toString();

@@ -3,6 +3,7 @@ Feature: Inspirational Driven Development
   Background:
     Given I create a logical/physical data using the schema
       """
+      @import finitio/data
       Title = String( s | s.length > 0 )
 
       Logical = {

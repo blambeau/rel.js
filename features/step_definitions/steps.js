@@ -1,12 +1,10 @@
 module.exports = function(){
   Rel = require('../../lib/rel');
-  Finitio = require('finitio.js');
+  Finitio = require('finitio');
   fs = require('fs');
   expect = require('expect.js');
 
-  var fioOpts = { world: { Finitio: Finitio } };
-  var kernelSrc = fs.readFileSync('features/step_definitions/kernel.fio').toString();
-  var kernel = Finitio.parse(kernelSrc, fioOpts);
+  var fioOpts = { };
   var dbSystem = null;
   var dbOpts   = null;
   var database = null;
@@ -39,7 +37,7 @@ module.exports = function(){
   }
   
   prom.Given(/^I create a logical\/physical data using the schema$/, function(src) {
-    dbSystem = kernel.parse(src, fioOpts);
+    dbSystem = Finitio.system(src, fioOpts);
     dbOpts = {
       name: "testdb",
       system:   dbSystem,
