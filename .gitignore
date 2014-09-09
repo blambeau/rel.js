@@ -2,3 +2,5 @@ node_modules
 logical
 physical
 testdb
+dist
+npm-debug.log
