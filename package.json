@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "underscore": "~1.6.0",
-    "pouchdb": "~2.2.0",
+    "pouchdb": "~3.0",
     "finitio.js": "git://github.com/llambeau/finitio.js.git#master"
   },
   "devDependencies": {
